@@ -7,9 +7,11 @@
 //
 
 import UIKit
+import SnapKit
 
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    
+
+    // MARK: - lazy
     lazy var collectionView: UICollectionView = {
        let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -24,6 +26,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }()
 
     let cellId = "cellId"
+    let loginCellId = "loginCellId"
+    
     
     let pages: [Page] = {
         
@@ -37,66 +41,149 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }()
     
     
+    lazy var pageControl: UIPageControl = {
+        let pc = UIPageControl()
+        pc.pageIndicatorTintColor = .lightGray
+        pc.currentPageIndicatorTintColor = UIColor(red: 247/255, green: 154/255, blue: 27/255, alpha: 1)
+        pc.numberOfPages = self.pages.count + 1
+        return pc
+    }()
     
+    
+    let skipButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Skip", for: .normal)
+        button.setTitleColor(UIColor(red: 247/255, green: 154/255, blue: 27/255, alpha: 1), for: .normal)
+        return button
+    }()
+    
+    let nextButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Next", for: .normal)
+        button.setTitleColor(UIColor(red: 247/255, green: 154/255, blue: 27/255, alpha: 1), for: .normal)
+        return button
+    }()
+    
+    
+    
+    // MARK: - system func
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.addSubview(collectionView)
-        collectionView.frame = view.frame
+        view.addSubview(pageControl)
+        view.addSubview(skipButton)
+        view.addSubview(nextButton)
         
-        // use autolayout instead
         collectionView.anchorToTop(top: view.topAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor)
+        registerCells()
         
+        pageControl.snp.makeConstraints { (make) in
+            make.left.right.bottom.equalToSuperview()
+            make.height.equalTo(40)
+        }
+        
+        skipButton.snp.makeConstraints { (make) in
+            make.top.equalTo(16)
+            make.left.equalTo(0);
+            make.size.equalTo(CGSize(width: 60, height: 50))
+        }
+        
+        nextButton.snp.makeConstraints { (make) in
+            make.top.equalTo(16)
+            make.right.equalTo(0)
+            make.size.equalTo(CGSize(width: 60, height: 50))
+        }
+    }
+    
+    // MARK: - private func
+    fileprivate func registerCells() {
         collectionView.register(PageCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: loginCellId)
     }
     
     
+    // MARK: - UICollectionViewDelegate/DataSource/FlowLayout
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return pages.count
+        return pages.count + 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        if indexPath.item == pages.count {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: loginCellId, for: indexPath)
+            return cell
+        }
+        
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! PageCell
-        
         let page = pages[indexPath.item]
-        
         cell.page = page
-        
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return view.bounds.size
     }
-
-}
-
-extension UIView {
-
-    func anchorToTop(top: NSLayoutYAxisAnchor? = nil, left: NSLayoutXAxisAnchor? = nil, bottom: NSLayoutYAxisAnchor? = nil, right: NSLayoutXAxisAnchor? = nil) {
-        
-        anchorWithConstantsToTop(top: top, left: left, bottom: bottom, right: right, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
-    }
     
-    func anchorWithConstantsToTop(top: NSLayoutYAxisAnchor? = nil, left: NSLayoutXAxisAnchor? = nil, bottom: NSLayoutYAxisAnchor? = nil, right: NSLayoutXAxisAnchor? = nil, topConstant: CGFloat = 0, leftConstant: CGFloat = 0, bottomConstant: CGFloat = 0, rightConstant: CGFloat = 0) {
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         
-        translatesAutoresizingMaskIntoConstraints = false
+        // page control
+        let pageNum = Int(targetContentOffset.pointee.x / view.bounds.size.width)
+        pageControl.currentPage = pageNum
         
-        if let top = top {
-            topAnchor.constraint(equalTo: top, constant: topConstant).isActive = true
+        var pageOffset = 0.0
+        var topButtonOffset = 0.0
+        
+        if pageNum == pages.count {
+            pageOffset = 40
+            topButtonOffset = -40
+        }else {
+            pageOffset = 0.0
+            topButtonOffset = 16
         }
         
-        if let bottom = bottom {
-            bottomAnchor.constraint(equalTo: bottom, constant: bottomConstant).isActive = true
+        
+        // animation
+        pageControl.snp.updateConstraints({ (make) in
+            make.bottom.equalTo(pageOffset)
+        })
+        
+        skipButton.snp.updateConstraints { (make) in
+            make.top.equalTo(topButtonOffset)
         }
         
-        if let left = left {
-            leftAnchor.constraint(equalTo: left, constant: leftConstant).isActive = true
+        nextButton.snp.updateConstraints { (make) in
+            make.top.equalTo(topButtonOffset)
         }
         
-        if let right = right {
-            rightAnchor.constraint(equalTo: right, constant: rightConstant).isActive = true
-        }
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+            
+            self.view.layoutIfNeeded()
+            
+        }, completion: nil)
+        
+        
     }
+
+    
+    
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
