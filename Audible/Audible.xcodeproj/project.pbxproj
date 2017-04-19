@@ -15,6 +15,7 @@
 		063F75EA1EA500A0004FEF1B /* PageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F75E91EA500A0004FEF1B /* PageCell.swift */; };
 		063F75EC1EA51524004FEF1B /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F75EB1EA51524004FEF1B /* Page.swift */; };
 		063F76011EA64C56004FEF1B /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F76001EA64C56004FEF1B /* Extensions.swift */; };
+		063F76261EA79827004FEF1B /* LoginCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F76251EA79827004FEF1B /* LoginCell.swift */; };
 		0AAFEF0EF65051B430BA556C /* Pods_Audible.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDDA8430AFC8F749D091BF4C /* Pods_Audible.framework */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,7 @@
 		063F75E91EA500A0004FEF1B /* PageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageCell.swift; sourceTree = "<group>"; };
 		063F75EB1EA51524004FEF1B /* Page.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		063F76001EA64C56004FEF1B /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		063F76251EA79827004FEF1B /* LoginCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginCell.swift; sourceTree = "<group>"; };
 		835BDDAD781F9783D09304F3 /* Pods-Audible.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Audible.release.xcconfig"; path = "Pods/Target Support Files/Pods-Audible/Pods-Audible.release.xcconfig"; sourceTree = "<group>"; };
 		C779DB65EF546CFE6773589A /* Pods-Audible.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Audible.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Audible/Pods-Audible.debug.xcconfig"; sourceTree = "<group>"; };
 		FDDA8430AFC8F749D091BF4C /* Pods_Audible.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Audible.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,6 +78,7 @@
 				063F75E91EA500A0004FEF1B /* PageCell.swift */,
 				063F75EB1EA51524004FEF1B /* Page.swift */,
 				063F76001EA64C56004FEF1B /* Extensions.swift */,
+				063F76251EA79827004FEF1B /* LoginCell.swift */,
 			);
 			path = Audible;
 			sourceTree = "<group>";
@@ -226,6 +229,7 @@
 				063F75D81EA4CF60004FEF1B /* AppDelegate.swift in Sources */,
 				063F75EC1EA51524004FEF1B /* Page.swift in Sources */,
 				063F75EA1EA500A0004FEF1B /* PageCell.swift in Sources */,
+				063F76261EA79827004FEF1B /* LoginCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

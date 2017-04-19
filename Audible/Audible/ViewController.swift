@@ -54,13 +54,15 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         let button = UIButton(type: .system)
         button.setTitle("Skip", for: .normal)
         button.setTitleColor(UIColor(red: 247/255, green: 154/255, blue: 27/255, alpha: 1), for: .normal)
+        button.addTarget(self, action: #selector(skip), for: .touchUpInside)
         return button
     }()
     
-    let nextButton: UIButton = {
+    lazy var nextButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Next", for: .normal)
         button.setTitleColor(UIColor(red: 247/255, green: 154/255, blue: 27/255, alpha: 1), for: .normal)
+        button.addTarget(self, action: #selector(nextPage), for: .touchUpInside)
         return button
     }()
     
@@ -69,6 +71,9 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     // MARK: - system func
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        observerKeyboardNotifications()
+        addTapGesture()
         
         view.addSubview(collectionView)
         view.addSubview(pageControl)
@@ -96,10 +101,81 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         }
     }
     
+
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    
     // MARK: - private func
     fileprivate func registerCells() {
+        
         collectionView.register(PageCell.self, forCellWithReuseIdentifier: cellId)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: loginCellId)
+        collectionView.register(LoginCell.self, forCellWithReuseIdentifier: loginCellId)
+        
+    }
+    
+    fileprivate func addTapGesture() {
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction))
+        view.addGestureRecognizer(tap)
+        
+    }
+    
+    fileprivate func observerKeyboardNotifications() {
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardShow), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardHide), name: .UIKeyboardWillHide, object: nil)
+        
+    }
+    
+    func keyboardShow() {
+    
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+            
+            let y:CGFloat = UIDevice.current.orientation.isLandscape ? -150 : -50;
+            self.view.frame = CGRect(x: 0, y: y, width: self.view.frame.width, height: self
+            .view.frame.height)
+            
+        }, completion: nil)
+    }
+    
+    func keyboardHide() -> Void {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
+            
+            self.view.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
+            
+        }, completion: nil)
+    }
+    
+    
+    func tapAction() -> Void {
+        view.endEditing(true)
+    }
+    
+    
+    func nextPage() {
+        
+        if pageControl.currentPage == pages.count {
+            return
+        }
+        
+        let indexPath = IndexPath(item: pageControl.currentPage + 1, section: 0)
+        
+        if indexPath.item == pages.count {
+            moveControlConstraintsScreenAnimation(pageOffset: 40, topButtonOffset: -40)
+        }
+        
+        pageControl.currentPage = indexPath.item
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+    }
+    
+    func skip() -> Void {
+        
+        pageControl.currentPage = pages.count - 1
+        nextPage()
+        
     }
     
     
@@ -126,23 +202,32 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         return view.bounds.size
     }
     
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        view.endEditing(true)
+    }
+    
+    
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         
         // page control
         let pageNum = Int(targetContentOffset.pointee.x / view.bounds.size.width)
         pageControl.currentPage = pageNum
         
-        var pageOffset = 0.0
-        var topButtonOffset = 0.0
-        
         if pageNum == pages.count {
-            pageOffset = 40
-            topButtonOffset = -40
+            
+            moveControlConstraintsScreenAnimation(pageOffset: 40, topButtonOffset: -40)
+            
         }else {
-            pageOffset = 0.0
-            topButtonOffset = 16
+            
+            moveControlConstraintsScreenAnimation(pageOffset: 0.0, topButtonOffset: 16)
+            
         }
         
+    }
+    
+    
+    fileprivate func moveControlConstraintsScreenAnimation(pageOffset: CGFloat, topButtonOffset: CGFloat) -> Void {
         
         // animation
         pageControl.snp.updateConstraints({ (make) in
@@ -157,17 +242,29 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             make.top.equalTo(topButtonOffset)
         }
         
-        
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
             
             self.view.layoutIfNeeded()
             
         }, completion: nil)
-        
-        
+
     }
 
     
+    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+//        UIDevice.current.orientation.isLandscape
+        
+        collectionView.collectionViewLayout.invalidateLayout()
+        
+        let indexPath = IndexPath(item: pageControl.currentPage, section: 0)
+        
+        DispatchQueue.main.async {
+            self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+            self.collectionView.reloadData()
+        }
+        
+        
+    }
     
 
 }
