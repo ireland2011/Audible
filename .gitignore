@@ -20,6 +20,14 @@ xcuserdata/
 ## Other
 *.moved-aside
 *.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+xcshareddata/
+.metadata/
+
+## Pods / Podfile.lock
+Pods/
+Podfile.lock
 
 ## Obj-C/Swift specific
 *.hmap
