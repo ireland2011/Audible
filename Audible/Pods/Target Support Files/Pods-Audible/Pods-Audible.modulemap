@@ -1,6 +1,0 @@
-framework module Pods_Audible {
-  umbrella header "Pods-Audible-umbrella.h"
-
-  export *
-  module * { export * }
-}
