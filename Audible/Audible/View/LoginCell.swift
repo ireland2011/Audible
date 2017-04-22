@@ -12,6 +12,9 @@ import SnapKit
 class LoginCell: UICollectionViewCell {
     
     
+    var loggedInBlock:((Void) -> Void)?
+    
+    
     let logoImageView: UIImageView = {
         let imageView = UIImageView(image: #imageLiteral(resourceName: "logo"))
         return imageView
@@ -36,11 +39,12 @@ class LoginCell: UICollectionViewCell {
         return textFiled
     }()
     
-    let loginButton: UIButton = {
+    lazy var loginButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = .orange
         button.setTitle("Login in", for: .normal)
         button.setTitleColor(.white, for: .normal)
+        button.addTarget(self, action: #selector(loginButtonClicked), for: .touchUpInside)
         return button
     }()
     
@@ -86,6 +90,15 @@ class LoginCell: UICollectionViewCell {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    // MARK: - Actions
+    func loginButtonClicked() -> Void {
+        
+        if let _ = loggedInBlock {
+            loggedInBlock!()
+        }
     }
     
 }

@@ -9,7 +9,7 @@
 import UIKit
 import SnapKit
 
-class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+class LoginController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
 
     // MARK: - lazy
     lazy var collectionView: UICollectionView = {
@@ -27,7 +27,6 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 
     let cellId = "cellId"
     let loginCellId = "loginCellId"
-    
     
     let pages: [Page] = {
         
@@ -187,7 +186,22 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         if indexPath.item == pages.count {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: loginCellId, for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: loginCellId, for: indexPath) as! LoginCell
+            cell.loggedInBlock = {
+                
+                let rootViewController = UIApplication.shared.keyWindow?.rootViewController
+                
+                guard let mainNavigationController = rootViewController as? MainNaigationController else { return }
+                
+                mainNavigationController.viewControllers = [HomeController()]
+                
+                UserDefaults.standard.setIsLoggedIn(value: true)
+                
+                self.dismiss(animated: true, completion: nil)
+                
+            }
+            
+            
             return cell
         }
         
